@@ -42,12 +42,6 @@
                     </p>
                 </div>
             </div>
-            <!-- grid-cols-1 @2xl:grid-cols-2 @5xl:grid-cols-3 @7xl:grid-cols-4 gap-4 -->
-            <!-- <ImageCard v-for="image of responseData" key="image.id" :image-data="image" :intersectionObserverRef
-                class="hover:scale-105 duration-200" /> -->
-            <!-- <div
-                class="grow-0 col-span-1 @2xl:col-span-2 @5xl:col-span-3 @7xl:col-span-4 shrink-0 flex flex-col justify-center py-2">
-            </div> -->
         </div>
     </div>
 </template>
@@ -56,12 +50,12 @@
 import PaginationControls from '@/components/PaginationControls.vue';
 import ImageCard from '@/components/ImageCard.vue';
 import axios from 'axios';
-import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { onBeforeRouteUpdate } from 'vue-router';
 import type { ImageInterface } from '@/types';
 import { useWindowResize } from './composable';
 
-const { height, width } = useWindowResize();
+const { width } = useWindowResize();
 // Props
 const props = defineProps({
     page: {
