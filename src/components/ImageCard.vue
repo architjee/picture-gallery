@@ -30,20 +30,20 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 
 const props = defineProps<{
     imageData: ImageInterface & { isVisible: boolean }
-    observerRef?: IntersectionObserver;
+    intersectionObserverRef?: IntersectionObserver;
 }>();
 
 const imageCardElementRef = ref<HTMLDivElement>();
 onMounted(() => {
-    if (imageCardElementRef.value && props.observerRef) {
-        props.observerRef.observe(imageCardElementRef.value);
+    if (imageCardElementRef.value && props.intersectionObserverRef) {
+        props.intersectionObserverRef.observe(imageCardElementRef.value);
     }
 })
 const getBgImage = computed(() => `url(https://picsum.photos/id/${props.imageData.id}/30/20)`)
 
 onBeforeUnmount(() => {
-    if (imageCardElementRef.value && props.observerRef) {
-        props.observerRef.unobserve(imageCardElementRef.value);
+    if (imageCardElementRef.value && props.intersectionObserverRef) {
+        props.intersectionObserverRef.unobserve(imageCardElementRef.value);
     }
 })
 </script>

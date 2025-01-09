@@ -1,6 +1,7 @@
 import type { Config } from 'tailwindcss'
 import { iconsPlugin, getIconCollections } from '@egoist/tailwindcss-icons';
-
+import daisyui from 'daisyui';
+import containerQueryPlugin from '@tailwindcss/container-queries';
 export default {
   content: [
     "./index.html",
@@ -10,7 +11,8 @@ export default {
     extend: {},
   },
   plugins: [
-    require('daisyui'),
+    daisyui, 
+    containerQueryPlugin,
     iconsPlugin({
       collections: getIconCollections(["heroicons"]),
     }),

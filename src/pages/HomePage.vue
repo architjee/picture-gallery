@@ -1,10 +1,23 @@
 <template>
     <progress v-show="loading" class="d-progress shrink-0 h-1 w-full"></progress>
-    <div class="grow flex flex-col overflow-y-auto">
+    <div class="grow flex overflow-y-auto">
         <div ref="galleryContainerParent"
-            class="grid grow grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 overflow-y-scroll place-items-center px-4 py-8">
-            <ImageCard v-for="image of responseData" key="image.id" :image-data="image" :observerRef
-                class="hover:scale-105 duration-200" />
+            class="w-full grid grow grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 overflow-y-scroll place-items-center px-4 py-8">
+            <ImageCard v-for="image of responseData" key="image.id" :image-data="image" :intersectionObserverRef
+                class="hover:scale-105 duration-200" @click="handleImageClick" />
+            <div class="grow-0 col-span-1 sm:col-span-2 lg:col-span-3 xl:col-span-4 shrink-0 flex flex-col justify-center py-2">
+                <PaginationControls v-if="responseData.length" :page="pageMeta.currentPage" />
+                <div v-else
+                    class="grow h-full flex flex-col justify-center items-center overflow-clip">
+                    <!-- spinner to render when there are no items -->
+                    <span class="d-loading d-loading-spinner d-loading-lg"></span>
+                </div>
+            </div>
+        </div>
+        <div v-if="showSidePanel"
+            class="w-full grid grow grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 overflow-y-scroll place-items-center px-4 py-8">
+            <!-- <ImageCard v-for="image of responseData" key="image.id" :image-data="image" :intersectionObserverRef
+                class="hover:scale-105 duration-200" /> -->
             <div class="grow-0 col-span-1 sm:col-span-2 lg:col-span-3 xl:col-span-4 shrink-0 flex flex-col justify-center py-2">
                 <PaginationControls v-if="responseData.length" :page="pageMeta.currentPage" />
                 <div v-else
@@ -43,7 +56,8 @@ const pageMeta = computed(() => ({
     itemsPerPage: itemsPerPage.value,
 }));
 const loading = ref<boolean>(false);
-const observerRef = ref<IntersectionObserver>();
+const intersectionObserverRef = ref<IntersectionObserver>();
+const resizeObserverRef = ref<ResizeObserver>();
 const galleryContainerParent = ref<HTMLDivElement>();
 const NumberOfItems = 30;
 const responseData = ref<Array<ImageInterface & { isVisible: boolean }>>([]);
@@ -72,32 +86,41 @@ const isIntersectingCallback: IntersectionObserverCallback = (entries: Intersect
     });
 }
 
+const resizeObserverCallback: ResizeObserverCallback = (entries: ResizeObserverEntry[], observer: ResizeObserver) => {
+    entries.forEach((entry) => {
+        console.log('ResizeObserverCallback', entry.borderBoxSize[0].inlineSize, entry.borderBoxSize[0].blockSize);
+    });
+}
+
 function observeImages() {
-    if (observerRef.value) {
+    if (intersectionObserverRef.value) {
         document.querySelectorAll('[data-image="image"]').forEach((element) => {
-            observerRef.value?.observe(element);
+            intersectionObserverRef.value?.observe(element);
         });
     }
 }
-
+const showSidePanel = ref(false);
 onMounted(() => {
     loading.value = true;
     fetchImagesMetaData();
     fetchImagesData(props.page);
-    const options = {
-        root: galleryContainerParent?.value,
-        rootMargin: "0px", // This can be changed based on the requirement on how much offset we wish to preload
-    };
-    console.log(galleryContainerParent.value, galleryContainerParent.value?.getBoundingClientRect().height);
-    const observer = new IntersectionObserver(isIntersectingCallback, options);
-    observerRef.value = observer;
-    observeImages();
-    loading.value = false;
+    if(galleryContainerParent?.value){
+        const options = {
+            root: galleryContainerParent?.value,
+            rootMargin: "0px", // This can be changed based on the requirement on how much offset we wish to preload
+        };
+        console.log(galleryContainerParent.value, galleryContainerParent.value?.getBoundingClientRect().height);
+        intersectionObserverRef.value = new IntersectionObserver(isIntersectingCallback, options);
+        resizeObserverRef.value = new ResizeObserver(resizeObserverCallback);
+        resizeObserverRef.value.observe(galleryContainerParent.value);
+        observeImages();
+        loading.value = false;
+    }
 });
 
 onUnmounted(() => {
-    if (observerRef.value) {
-        observerRef.value?.disconnect();
+    if (intersectionObserverRef.value) {
+        intersectionObserverRef.value?.disconnect();
     }
 })
 
@@ -108,4 +131,8 @@ onBeforeRouteUpdate((to, _from, next) => {
     fetchImagesData(newPage as string).then(() => loading.value = false);
     next();
 });
+
+function handleImageClick() {
+    showSidePanel.value = !showSidePanel.value;
+}
 </script>
