@@ -16,11 +16,15 @@
         <StaticRoutes></StaticRoutes>
       </ul>
     </div>
-    <ThemeSwitcherButton class="d-navbar-end" />
+    <div class="d-navbar-end">
+      <ToggleSomething></ToggleSomething>
+      <ThemeSwitcherButton />
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
+import ToggleSomething from '@/components/ToggleSomething.vue';
 import StaticRoutes from '@/components/StaticRoutes.vue';
 import ThemeSwitcherButton from '@/components/ThemeSwitcherButton.vue'
 

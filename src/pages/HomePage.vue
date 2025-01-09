@@ -22,12 +22,14 @@
                     <i class="i-heroicons-x-mark"></i>
                 </button>
             </div>
-            <!-- <div class=""> -->
-                <div v-if="previewImageRef" :class="{ 'blur-xl': !previewImageRef.isVisible }"
-                    :style="{ backgroundImage: getBgImage }" class="size-full bg-cover overflow-y-hidden bg-no-repeat bg-center">
-                    <img :src="previewImageRef.download_url" @load="previewImageRef.isVisible = true"
-                        class="size-full object-contain backdrop-blur-xl" :class=" previewImageRef.isVisible ? 'block': 'hidden' " alt="">
-                </div>
+            <!-- <div class="size-full"> -->
+            <div v-if="previewImageRef" :class="{ 'blur-xl': !previewImageRef.isVisible }"
+                :style="{ backgroundImage: getBgImage }"
+                class="size-full bg-cover overflow-y-hidden bg-no-repeat bg-center">
+                <img :src="previewImageRef.download_url" @load="previewImageRef.isVisible = true"
+                    class="size-full object-contain backdrop-blur-xl"
+                    :class="previewImageRef.isVisible ? 'block' : 'hidden'" alt="">
+            </div>
             <!-- </div> -->
             <div class="grow">
                 <div class="mx-auto w-fit text-center">
