@@ -1,5 +1,5 @@
 <template>
-    <li v-for="route in routes" :key="route.path">
+    <li v-for="route in routes" :key="route.path" class="capitalize">
         <RouterLink :to="route.path">
             {{ route.name }}
         </RouterLink>
