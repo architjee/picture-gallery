@@ -10,7 +10,7 @@
                 </div>
             </div>
         </figure>
-        <div class="d-card-body">
+        <div class="d-card-body gap-y-5">
             <h2 class="text-lg truncate">Author - {{ props.imageData.author }}</h2>
             <div>
                 <a :href="props.imageData.url" class="hover:underline hover:text-info text-sm"

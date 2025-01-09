@@ -1,19 +1,18 @@
 <template>
-    <progress v-show="loading" class="d-progress shrink w-full"></progress>
-    <div ref="galleryContainerParent" class="grow overflow-y-auto flex flex-col py-4">
-        <template v-if="responseData.length">
-            <div
-                class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 overflow-y-scroll place-items-center px-4 py-8">
-                <ImageCard v-for="image of responseData" key="image.id" :image-data="image" :observerRef
-                    class="hover:scale-105 duration-200" />
+    <progress v-show="loading" class="d-progress shrink-0 h-1 w-full"></progress>
+    <div class="grow flex flex-col overflow-y-auto">
+        <div ref="galleryContainerParent"
+            class="grid grow grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 overflow-y-scroll place-items-center px-4 py-8">
+            <ImageCard v-for="image of responseData" key="image.id" :image-data="image" :observerRef
+                class="hover:scale-105 duration-200" />
+            <div class="grow-0 col-span-1 sm:col-span-2 lg:col-span-3 xl:col-span-4 shrink-0 flex flex-col justify-center py-2">
+                <PaginationControls v-if="responseData.length" :page="pageMeta.currentPage" />
+                <div v-else
+                    class="grow h-full flex flex-col justify-center items-center overflow-clip">
+                    <!-- spinner to render when there are no items -->
+                    <span class="d-loading d-loading-spinner d-loading-lg"></span>
+                </div>
             </div>
-            <div class="grow-0 shrink-0 flex justify-center">
-                <PaginationControls :page="pageMeta.currentPage" />
-            </div>
-        </template>
-        <div v-else class="grow h-full flex flex-col justify-center items-center overflow-clip">
-            <!-- spinner to render when there are no items -->
-            <span class="d-loading d-loading-spinner d-loading-lg"></span>
         </div>
     </div>
 </template>
@@ -89,6 +88,7 @@ onMounted(() => {
         root: galleryContainerParent?.value,
         rootMargin: "0px", // This can be changed based on the requirement on how much offset we wish to preload
     };
+    console.log(galleryContainerParent.value, galleryContainerParent.value?.getBoundingClientRect().height);
     const observer = new IntersectionObserver(isIntersectingCallback, options);
     observerRef.value = observer;
     observeImages();
