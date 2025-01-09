@@ -1,7 +1,7 @@
 <template>
     <div ref="galleryContainerParent" class="h-full overflow-y-auto">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 overflow-y-scroll place-items-center px-4">
-            <ImageCard v-for="image of responseData" key="image.id" :image-data="image" :observerRef />
+            <ImageCard v-for="image of responseData" key="image.id" :image-data="image" :observerRef class="hover:scale-105 duration-200" />
         </div>
     </div>
 </template>
