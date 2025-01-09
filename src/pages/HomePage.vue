@@ -1,6 +1,6 @@
 <template>
     <div ref="galleryContainerParent" class="h-full overflow-y-auto">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 overflow-y-scroll place-items-center px-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 overflow-y-scroll place-items-center px-4  py-12">
             <ImageCard v-for="image of responseData" key="image.id" :image-data="image" :observerRef class="hover:scale-105 duration-200" />
         </div>
     </div>
@@ -24,10 +24,8 @@ const galleryContainerParent = ref<HTMLDivElement>();
 
 const observerRef = ref<IntersectionObserver>();
 const logme: IntersectionObserverCallback = (entries: IntersectionObserverEntry[], observer: IntersectionObserver) => {
-    console.log(entries, 'Entries', entries.length);
     entries.forEach((entry) => {
         if (entry.isIntersecting) {
-            console.log('Target with id', entry.target.getAttribute('data-image-id'), 'is intersecting');
             responseData.value.forEach((image) => {
                 if (Number(image.id) === Number(entry.target.getAttribute('data-image-id'))) {
                     console.log('Image with id is visible', image.id);
@@ -36,7 +34,6 @@ const logme: IntersectionObserverCallback = (entries: IntersectionObserverEntry[
             }); 
             observer.unobserve(entry.target);
         }
-        // entry.isIntersecting? console.log('Intersecting') : console.log('Not Intersecting');
     });
 }
 onMounted(() => {
@@ -46,13 +43,10 @@ onMounted(() => {
     document.querySelectorAll('[data-image="image"]').forEach((element) => {
         observer.observe(element);
     });
-    console.log('Bounds of root are ', galleryContainerParent?.value);
 
-    console.log(document.querySelectorAll('[data-image="image"]'));
     const options = {
         root: galleryContainerParent?.value,
-        rootMargin: "0px",
-        // threshold: 1.0,
+        rootMargin: "0px", // This can be changed based on the requirement on how much offset we wish to preload
     };
     const observer = new IntersectionObserver(logme, options);
     observerRef.value = observer;
