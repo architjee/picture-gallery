@@ -1,4 +1,6 @@
 import type { Config } from 'tailwindcss'
+
+
 import { iconsPlugin, getIconCollections } from '@egoist/tailwindcss-icons';
 import daisyui from 'daisyui';
 import containerQueryPlugin from '@tailwindcss/container-queries';
