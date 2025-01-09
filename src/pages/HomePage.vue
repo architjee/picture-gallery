@@ -23,7 +23,7 @@ async function fetchImagesMetaData() {
 const galleryContainerParent = ref<HTMLDivElement>();
 
 const observerRef = ref<IntersectionObserver>();
-const logme: IntersectionObserverCallback = (entries: IntersectionObserverEntry[], observer: IntersectionObserver) => {
+const isIntersectingCallback: IntersectionObserverCallback = (entries: IntersectionObserverEntry[], observer: IntersectionObserver) => {
     entries.forEach((entry) => {
         if (entry.isIntersecting) {
             responseData.value.forEach((image) => {
@@ -48,7 +48,7 @@ onMounted(() => {
         root: galleryContainerParent?.value,
         rootMargin: "0px", // This can be changed based on the requirement on how much offset we wish to preload
     };
-    const observer = new IntersectionObserver(logme, options);
+    const observer = new IntersectionObserver(isIntersectingCallback, options);
     observerRef.value = observer;
 
 });
