@@ -1,6 +1,6 @@
 <template>
     <div ref="galleryContainerParent" class="h-full overflow-y-auto">
-        <div ref="galleryContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 overflow-y-scroll place-items-center px-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 overflow-y-scroll place-items-center px-4">
             <ImageCard v-for="image of responseData" key="image.id" :image-data="image" :observerRef />
         </div>
     </div>
@@ -20,11 +20,7 @@ async function fetchImagesMetaData() {
     responseData.value = response.data;
 }
 
-const galleryContainer = ref<HTMLDivElement>();
 const galleryContainerParent = ref<HTMLDivElement>();
-// onBeforeMount(() => {
-//     console.log(galleryContainer.value);
-// });
 
 const observerRef = ref<IntersectionObserver>();
 const logme: IntersectionObserverCallback = (entries: IntersectionObserverEntry[], observer: IntersectionObserver) => {
