@@ -7,8 +7,7 @@ import { RouterView } from 'vue-router';
 <template>
   <div class="h-screen flex flex-col justify-between items-center border-2 border-base-content bg-base-100">
     <NavBar></NavBar>
-    <div class="w-full overflow-y-auto">
-      <!-- <HomePage></HomePage> -->
+    <div class="w-full grow flex flex-col overflow-y-auto">
       <RouterView></RouterView>
     </div>
     <TheFooter />
