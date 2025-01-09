@@ -7,6 +7,13 @@ export default {
   theme: {
     extend: {},
   },
-  plugins: [],
+  plugins: [
+    require('daisyui'),
+  ],
+  daisyui: {
+    themes: false,
+    darkTheme: "dark", // name of one of the included themes for dark mode
+    prefix: "d-", // prefix for daisyUI classnames (components, modifiers and responsive class names. Not colors)
+  },
 }
 
