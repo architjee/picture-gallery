@@ -23,32 +23,10 @@
                 </div>
             </div>
         </div>
-        <div v-if="width > SCREEN_MD && showSidePanel" class="w-full h-full grow flex flex-col overflow-x-clip">
-            <div class="flex w-full justify-end p-4">
-                <button class="d-btn d-btn-circle d-btn-outline d-btn-sm" @click="showSidePanel = false">
-                    <i class="i-heroicons-x-mark"></i>
-                </button>
-            </div>
-            <div v-if="previewImageRef" :class="{ 'blur-xl': !previewImageRef.isVisible }"
-                :style="{ backgroundImage: getBgImage }"
-                class="size-full bg-cover overflow-y-hidden bg-no-repeat bg-center">
-                <img :src="previewImageRef.download_url" @load="previewImageRef.isVisible = true"
-                    class="size-full object-contain backdrop-blur-xl"
-                    :class="previewImageRef.isVisible ? 'block' : 'hidden'" alt="">
-            </div>
-            <div class="grow">
-                <div class="mx-auto w-fit text-center">
-                    <a class="text-info hover:cursor-pointer hover:underline">{{ previewImageRef?.url }}</a>
-                    <p class="text-sm">
-                        Size : {{ previewImageRef?.width }} x {{ previewImageRef?.height }}
-                    </p>
-                    <p class="italic">
-                        Author : {{ previewImageRef?.author }}
-                    </p>
-                </div>
-            </div>
-        </div>
+            <SidePanel v-if="showSidePanel" v-model="showSidePanel" :previewImageData="previewImageRef!" @update:modelValue="closeSidePanel">
+            </SidePanel>
     </div>
+    <!-- Open the modal using ID.showModal() method -->
 </template>
 
 <script setup lang="ts">
@@ -58,16 +36,14 @@ import axios from 'axios';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { onBeforeRouteUpdate, useRoute } from 'vue-router';
 import type { ImageInterface } from '@/types';
-import { useWindowResize } from '@/composables/useWindowResize';
 import { useGalleryWidth } from '@/composables/useGalleryWidth';
+import SidePanel from '@/components/SidePanel.vue';
 import { useUtilStore } from '@/stores';
 import { storeToRefs } from 'pinia';
 
-const { width } = useWindowResize();
 const { setGalleryWidth } = useGalleryWidth();
 const { getItemsPerPage } = storeToRefs(useUtilStore());
 
-const SCREEN_MD = 768;
 const props = defineProps({
     page: {
         type: String,
@@ -87,7 +63,7 @@ const resizeObserverRef = ref<ResizeObserver>();
 const galleryContainerParent = ref<HTMLDivElement>();
 
 const responseData = ref<Array<ImageInterface & { isVisible: boolean }>>([]);
-const previewImageRef = ref<ImageInterface & { isVisible: boolean }>();
+const previewImageRef = ref<ImageInterface>();
 
 watch(getItemsPerPage, (itemsPerPageValue?: number) => {
     loading.value = true;
@@ -165,12 +141,16 @@ onBeforeRouteUpdate((to, _from, next) => {
 
 function handleImageClick(image: ImageInterface) {
     if (image.id !== previewImageRef?.value?.id) {
-        previewImageRef.value = { ...image, isVisible: false };
+        previewImageRef.value = { ...image };
         showSidePanel.value = true;
     } else {
         showSidePanel.value = !showSidePanel.value;
     }
 }
 
-const getBgImage = computed(() => `url(https://picsum.photos/id/${previewImageRef?.value?.id}/30/20)`);
+function closeSidePanel() {
+    previewImageRef.value = undefined;
+    showSidePanel.value = false;
+}
+
 </script>
