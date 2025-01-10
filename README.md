@@ -22,6 +22,8 @@
     ├── main.ts App's entrypoint
     └── tailwind.config.ts (Tailwind config + with icons)
 
+Demo at - https://picsum-photos.web.app/
+
 Using Pinia for state management, with persisted state plugin for persistance to localStorage
 
 Adding firebase with automatic CD using Github Action.
