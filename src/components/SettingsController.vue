@@ -14,10 +14,15 @@
                     class="d-input d-input-xs d-input-bordered w-full max-w-xs" @change="eventHandler" />
             </div>
         </div>
+        <div>
+            {{ useGalleryWidth().getMaxColumnPossible() }}
+        </div>
+        
     </div>
 </template>
 
 <script lang="ts" setup>
+import { useGalleryWidth } from '@/composables/useGalleryWidth';
 import { useUtilStore } from '@/stores';
 const { getItemsPerPage, setItemsPerPage } = useUtilStore()
 

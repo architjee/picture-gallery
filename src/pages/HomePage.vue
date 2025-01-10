@@ -30,7 +30,6 @@
             @update:modelValue="closeSidePanel">
         </SidePanel>
     </div>
-    <!-- Open the modal using ID.showModal() method -->
 </template>
 
 <script setup lang="ts">
@@ -45,7 +44,6 @@ import SidePanel from '@/components/SidePanel.vue';
 import { useUtilStore } from '@/stores';
 import { storeToRefs } from 'pinia';
 
-const { setGalleryWidth } = useGalleryWidth();
 const { getItemsPerPage } = storeToRefs(useUtilStore());
 
 const props = defineProps({
@@ -102,7 +100,28 @@ const isIntersectingCallback: IntersectionObserverCallback = (entries, observer)
 const resizeObserverCallback: ResizeObserverCallback = (entries) => {
     entries.forEach((entry) => {
         const width = entry.borderBoxSize[0].inlineSize;
-        setGalleryWidth(width);
+        useGalleryWidth().setGalleryWidth(width);
+        if (galleryContainerParent?.value) {
+            const BreakPointColumnMap = [
+                [1280, 4],
+                [1024, 3],
+                [672, 2],
+                [0, 1] 
+            ];
+            let maxCols = 1;
+            for (const [breakpoint, cols] of BreakPointColumnMap) {
+                if (width >= breakpoint) {
+                    maxCols = cols;
+                    break;
+                }
+            }
+            if(useGalleryWidth().getMaxColumnPossible() !== maxCols){
+                useGalleryWidth().setMaxColumnPossible(maxCols);
+                galleryContainerParent.value.style.setProperty('--max-col-possible', String(maxCols));
+                console.log(galleryContainerParent.value.style.getPropertyValue('--max-col-possible'));
+            }
+            // set a css variable indicating the max allowed
+        }
     });
 };
 
