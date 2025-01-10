@@ -17,16 +17,16 @@
       </ul>
     </div>
     <div class="d-navbar-end">
-      <ToggleSomething></ToggleSomething>
+      <SettingsController></SettingsController>
       <ThemeSwitcherButton />
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import ToggleSomething from '@/components/ToggleSomething.vue';
+import SettingsController from '@/components/SettingsController.vue';
 import StaticRoutes from '@/components/StaticRoutes.vue';
-import ThemeSwitcherButton from '@/components/ThemeSwitcherButton.vue'
+import ThemeSwitcherButton from '@/components/ThemeSwitcherButton.vue';
 
 </script>
 

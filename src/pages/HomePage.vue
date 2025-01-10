@@ -1,6 +1,7 @@
 <template>
     <!-- page change netowrk progress indicator -->
     <progress v-show="loading" class="d-progress shrink-0 h-1 w-full"></progress>
+
     <div class="grow flex overflow-y-auto divide-x-2 divide-base-300">
         <div class="size-full @container overflow-y-scroll">
             <div ref="galleryContainerParent"
@@ -9,7 +10,13 @@
                     class="hover:scale-105 hover:cursor-pointer duration-200" @click="handleImageClick(image)" />
                 <div
                     class="grow-0 col-span-1 @2xl:col-span-2 @5xl:col-span-3 @7xl:col-span-4 shrink-0 flex flex-col justify-center py-2">
-                    <PaginationControls v-if="responseData.length" :page="pageMeta.currentPage" />
+                    <template v-if="responseData.length">
+                        <p class="text-center text-xs my-2">
+                            Items per page - {{ useUtilStore().getItemsPerPage }}
+                        </p>
+                        <PaginationControls :page="pageMeta.currentPage" />
+                    </template>
+
                     <div v-else class="grow h-full flex flex-col justify-center items-center overflow-clip">
                         <!-- spinner to render when there are no items -->
                         <span class="d-loading d-loading-spinner d-loading-lg"></span>
@@ -51,11 +58,12 @@
 import PaginationControls from '@/components/PaginationControls.vue';
 import ImageCard from '@/components/ImageCard.vue';
 import axios from 'axios';
-import { computed, onMounted, onUnmounted, ref } from 'vue';
-import { onBeforeRouteUpdate } from 'vue-router';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { onBeforeRouteUpdate, useRoute } from 'vue-router';
 import type { ImageInterface } from '@/types';
 import { useWindowResize } from './composable';
 import { useGalleryWidth } from '@/composables/useGalleryWidth';
+import { useUtilStore } from '@/stores';
 
 const { width } = useWindowResize();
 const { setGalleryWidth } = useGalleryWidth();
@@ -71,18 +79,25 @@ const props = defineProps({
 
 const SCREEN_MD = 768;
 // state
-const itemsPerPage = ref(10);
+// const { itemsPerPage, getItemsPerPage } = useUtilStore();
+// const { itemsPerPage } = storeToRefs(useUtilStore());
+watch(() => useUtilStore().getItemsPerPage, (itemsPerPageValue?: number) => {
+    console.log('getItemsPerPage got updated');
+
+    loading.value = true;
+    const newPage = useRoute()?.query?.page || '1';
+    fetchImagesData(newPage as string, itemsPerPageValue ?? 30);
+})
+
 const pageMeta = computed(() => ({
     currentPage: Number(props.page),
-    totalPages: Math.ceil(100 / itemsPerPage.value),
     totalItems: 100,
-    itemsPerPage: itemsPerPage.value,
 }));
 const loading = ref<boolean>(false);
 const intersectionObserverRef = ref<IntersectionObserver>();
 const resizeObserverRef = ref<ResizeObserver>();
 const galleryContainerParent = ref<HTMLDivElement>();
-const NumberOfItems = 30;
+
 const responseData = ref<Array<ImageInterface & { isVisible: boolean }>>([]);
 const previewImageRef = ref<ImageInterface & { isVisible: boolean }>({
     id: "2",
@@ -98,10 +113,13 @@ async function fetchImagesMetaData() {
     await axios.get(`https://picsum.photos/v2/list?limit=100`);
 }
 
-async function fetchImagesData(page: string) {
-    const response = await axios.get(`https://picsum.photos/v2/list?page=${page}&limit=${NumberOfItems}`);
+async function fetchImagesData(page: string, itemsPerPage: number) {
+    console.log('fetchImagesData invoked');
+
+    const response = await axios.get(`https://picsum.photos/v2/list?page=${page}&limit=${itemsPerPage}`);
     responseData.value = response.data;
     observeImages();
+    loading.value = false;
 }
 
 const isIntersectingCallback: IntersectionObserverCallback = (entries: IntersectionObserverEntry[], observer: IntersectionObserver) => {
@@ -137,7 +155,7 @@ const showSidePanel = ref(false);
 onMounted(() => {
     loading.value = true;
     fetchImagesMetaData();
-    fetchImagesData(props.page);
+    fetchImagesData(props.page, useUtilStore().getItemsPerPage);
     if (galleryContainerParent?.value) {
         const options = {
             root: galleryContainerParent?.value,
@@ -161,8 +179,8 @@ onUnmounted(() => {
 // Use beforeRouteUpdate to handle route changes
 onBeforeRouteUpdate((to, _from, next) => {
     loading.value = true;
-    const newPage = to.query.page || '1';
-    fetchImagesData(newPage as string).then(() => loading.value = false);
+    const newPage = to?.query.page || '1';
+    fetchImagesData(newPage as string, useUtilStore().getItemsPerPage);
     next();
 });
 

@@ -1,6 +1,5 @@
 <template>
     <div>
-
         {{ modelValue }} - galleryWidth - {{ galleryWidth }} maxAllowedLimit - {{ getMaxAllowedLimit(galleryWidth) }}
         <input v-model="modelValue" type="range" min="1" :max="props.limit" class="d-range" step="1" />
         <div class="flex w-full justify-between px-2 text-xs">
