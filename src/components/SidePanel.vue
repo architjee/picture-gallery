@@ -1,7 +1,7 @@
 <template>
     <Teleport to="#modal_box_content" :disabled="!isMobile">
         <div v-if="showSidePanel" class="w-full h-full grow flex flex-col overflow-x-clip">
-            <div class="flex w-full justify-end p-4">
+            <div class="flex w-full justify-end pb-4 md:p-4">
                 <form method="dialog">
                     <button class="d-btn d-btn-sm d-btn-circle d-btn-outline right-2 top-2"
                         @click="handleClose">
@@ -49,7 +49,6 @@ const isMobile = computed(()=> width.value < SCREEN_MD);
 
 watch(isMobile, (newValue) => {
     dialogElementRef.value?.showModal();
-    console.log('watcher causeing',dialogElementRef.value);
     if(!newValue){
         dialogElementRef.value?.close();
     }
@@ -66,8 +65,6 @@ onMounted(()=>{
     dialogElementRef.value = document.getElementById('teleportableModal') as HTMLDialogElement;
     if(showSidePanel && isMobile.value){
         dialogElementRef.value?.showModal(); 
-    }else{
-        console.log('Something');
     }
 })
 
