@@ -2,6 +2,8 @@
 
 > A Vue.js picture gallery with Lazy loading implemented, using images from picsum.photos
 
+Demo at - https://picsum-photos.web.app/
+
 #### Directory layout and basic structuring of the project
 
 
@@ -22,12 +24,12 @@
     ├── main.ts App's entrypoint
     └── tailwind.config.ts (Tailwind config + with icons)
 
-Demo at - https://picsum-photos.web.app/
 
 Using Pinia for state management, with persisted state plugin for persistance to localStorage
 
 Adding firebase with automatic CD using Github Action.
 
+> Keeping in mind that user may choose to change screen when vieweing preview, using Teleport to take that component and teleport it to the dialog.
 
 Further Enhancements that can be made :
     - Add ESLint
