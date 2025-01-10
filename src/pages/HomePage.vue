@@ -1,4 +1,5 @@
 <template>
+    <!-- page change netowrk progress indicator -->
     <progress v-show="loading" class="d-progress shrink-0 h-1 w-full"></progress>
     <div class="grow flex overflow-y-auto divide-x-2 divide-base-300">
         <div class="size-full @container overflow-y-scroll">
@@ -54,8 +55,10 @@ import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { onBeforeRouteUpdate } from 'vue-router';
 import type { ImageInterface } from '@/types';
 import { useWindowResize } from './composable';
+import { useGalleryWidth } from '@/composables/useGalleryWidth';
 
 const { width } = useWindowResize();
+const { setGalleryWidth } = useGalleryWidth();
 // Props
 const props = defineProps({
     page: {
@@ -117,7 +120,9 @@ const isIntersectingCallback: IntersectionObserverCallback = (entries: Intersect
 
 const resizeObserverCallback: ResizeObserverCallback = (entries: ResizeObserverEntry[], observer: ResizeObserver) => {
     entries.forEach((entry) => {
-        console.log('ResizeObserverCallback', entry.borderBoxSize[0].inlineSize, entry.borderBoxSize[0].blockSize);
+        const width = entry.borderBoxSize[0].inlineSize;
+        console.log('ResizeObserverCallback', width, entry.borderBoxSize[0].blockSize);
+        setGalleryWidth(width);
     });
 }
 
