@@ -45,6 +45,10 @@ npm run build
 Added primary spinner when first time loading data,
 during navigation between pages, loading indicator at the top was used.
 
+The components are lazy loaded based on what are in the view, and so are the images.
+This prevents bandwidth by a margin.
+To show preview, I use, smaller version of image and blur it to give that cool effect.
+
 The side bar is collapsible && it Teleports to dialog in mobile view
 
 We use container size to calculate no of grid columns.
