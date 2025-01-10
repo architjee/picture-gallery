@@ -121,7 +121,6 @@ const resizeObserverCallback: ResizeObserverCallback = (entries) => {
             if(useGalleryWidth().getMaxColumnPossible() !== maxCols){
                 useGalleryWidth().setMaxColumnPossible(maxCols);
                 galleryContainerParent.value.style.setProperty('--max-col-possible', String(maxCols));
-                console.log(galleryContainerParent.value.style.getPropertyValue('--max-col-possible and set '));
                 useUtilStore().setMaxItemsPerRow(maxCols);
             }
             useGalleryWidth().setGalleryWidth(maxCols);
