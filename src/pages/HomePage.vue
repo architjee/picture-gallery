@@ -12,7 +12,7 @@
                     class="grow-0 col-span-1 @2xl:col-span-2 @5xl:col-span-3 @7xl:col-span-4 shrink-0 flex flex-col justify-center py-2">
                     <template v-if="responseData.length">
                         <p class="text-center text-xs my-2">
-                            Items per page - {{ useUtilStore().getItemsPerPage }}
+                            Showing {{ useUtilStore().getItemsPerPage }} images per page.
                         </p>
                         <PaginationControls :page="pageMeta.currentPage" />
                     </template>
