@@ -58,7 +58,7 @@ import axios from 'axios';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { onBeforeRouteUpdate, useRoute } from 'vue-router';
 import type { ImageInterface } from '@/types';
-import { useWindowResize } from './composable';
+import { useWindowResize } from '@/composables/useWindowResize';
 import { useGalleryWidth } from '@/composables/useGalleryWidth';
 import { useUtilStore } from '@/stores';
 import { storeToRefs } from 'pinia';
