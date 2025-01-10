@@ -24,6 +24,31 @@ Demo at - https://picsum-photos.web.app/
     ├── main.ts App's entrypoint
     └── tailwind.config.ts (Tailwind config + with icons)
 
+Run dev server using 
+
+```sh
+npm run dev
+```
+
+Build the project using
+
+```sh
+npm run build
+```
+
+> This project uses:
+>
+>    - pinia + pinia-persisted-state plugin
+>    - daisyui as a tailwind plugin
+>    - tailwind container queries plugin
+
+Added primary spinner when first time loading data,
+during navigation between pages, loading indicator at the top was used.
+
+The side bar is collapsible && it Teleports to dialog in mobile view
+
+We use container size to calculate no of grid columns.
+But can be overridden from settings controller.
 
 Using Pinia for state management, with persisted state plugin for persistance to localStorage
 
