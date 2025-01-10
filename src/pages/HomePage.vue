@@ -4,11 +4,12 @@
     <div class="grow flex overflow-y-auto divide-x-2 divide-base-300">
         <div class="size-full @container overflow-y-scroll">
             <div ref="galleryContainerParent"
-                class="w-full h-full grid grow grid-cols-1 @2xl:grid-cols-2 @5xl:grid-cols-3 @7xl:grid-cols-4 gap-4 overflow-y-scroll place-items-center px-4 py-8">
+                class="w-full h-full grid grow gap-4 overflow-y-scroll place-items-center px-4 py-8"
+                style="grid-template-columns: repeat(var(--grid-cols, 1), minmax(0, 1fr));" :style="{'--grid-cols': renderColumns}">
                 <ImageCard v-for="image of responseData" :key="image.id" :image-data="image" :intersectionObserverRef
                     class="hover:scale-105 hover:cursor-pointer duration-200" @click="handleImageClick(image)" />
-                <div
-                    class="grow-0 col-span-1 @2xl:col-span-2 @5xl:col-span-3 @7xl:col-span-4 shrink-0 flex flex-col justify-center py-2">
+                <div class="grow-0  shrink-0 flex flex-col justify-center py-2"
+                    style="grid-column: span var(--grid-cols, 1) / span var(--grid-cols, 1);">
                     <template v-if="responseData.length">
                         <p class="text-center text-xs my-2">
                             Showing {{ getItemsPerPage }} images per page.
@@ -23,17 +24,17 @@
                 </div>
             </div>
         </div>
-            <SidePanel v-if="showSidePanel" v-model="showSidePanel" :previewImageData="previewImageRef!" @update:modelValue="closeSidePanel">
-            </SidePanel>
+        <SidePanel v-if="showSidePanel" v-model="showSidePanel" :previewImageData="previewImageRef!"
+            @update:modelValue="closeSidePanel">
+        </SidePanel>
     </div>
-    <!-- Open the modal using ID.showModal() method -->
 </template>
 
 <script setup lang="ts">
 import PaginationControls from '@/components/PaginationControls.vue';
 import ImageCard from '@/components/ImageCard.vue';
 import axios from 'axios';
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { computed, onMounted, onUnmounted, ref,  watch } from 'vue';
 import { onBeforeRouteUpdate, useRoute } from 'vue-router';
 import type { ImageInterface } from '@/types';
 import { useGalleryWidth } from '@/composables/useGalleryWidth';
@@ -41,7 +42,6 @@ import SidePanel from '@/components/SidePanel.vue';
 import { useUtilStore } from '@/stores';
 import { storeToRefs } from 'pinia';
 
-const { setGalleryWidth } = useGalleryWidth();
 const { getItemsPerPage } = storeToRefs(useUtilStore());
 
 const props = defineProps({
@@ -56,6 +56,7 @@ const pageMeta = computed(() => ({
     currentPage: Number(props.page),
     totalItems: 100,
 }));
+const renderColumns = ref(1);
 
 const loading = ref<boolean>(false);
 const intersectionObserverRef = ref<IntersectionObserver>();
@@ -70,6 +71,10 @@ watch(getItemsPerPage, (itemsPerPageValue?: number) => {
     const newPage = useRoute()?.query?.page || '1';
     fetchImagesData(newPage as string, itemsPerPageValue ?? 30);
 });
+
+watch(()=> useGalleryWidth().columnsRendered.value,(columnsRendered: number)=>{
+    renderColumns.value = columnsRendered;
+})
 
 async function fetchImagesData(page: string, itemsPerPage: number) {
     try {
@@ -98,7 +103,29 @@ const isIntersectingCallback: IntersectionObserverCallback = (entries, observer)
 const resizeObserverCallback: ResizeObserverCallback = (entries) => {
     entries.forEach((entry) => {
         const width = entry.borderBoxSize[0].inlineSize;
-        setGalleryWidth(width);
+        useGalleryWidth().setGalleryWidth(width);
+        if (galleryContainerParent?.value) {
+            const BreakPointColumnMap = [
+                [1280, 4],
+                [1024, 3],
+                [672, 2],
+                [0, 1] 
+            ];
+            let maxCols = 1;
+            for (const [breakpoint, cols] of BreakPointColumnMap) {
+                if (width >= breakpoint) {
+                    maxCols = cols;
+                    break;
+                }
+            }
+            if(useGalleryWidth().getMaxColumnPossible() !== maxCols){
+                useGalleryWidth().setMaxColumnPossible(maxCols);
+                galleryContainerParent.value.style.setProperty('--max-col-possible', String(maxCols));
+                useUtilStore().setMaxItemsPerRow(maxCols);
+            }
+            useGalleryWidth().setGalleryWidth(maxCols);
+            // set a css variable indicating the max allowed
+        }
     });
 };
 

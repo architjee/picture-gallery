@@ -13,11 +13,19 @@
                 <input :value="getItemsPerPage" type="number" placeholder="Type here"
                     class="d-input d-input-xs d-input-bordered w-full max-w-xs" @change="eventHandler" />
             </div>
+            <div class="mt-3">
+                <input v-model="rangeModel" type="range" min="1" :max="useGalleryWidth().getMaxColumnPossible()" :value="useGalleryWidth().galleryWidth"
+                    class="d-range d-range-xs w-full" step="1" @change="useGalleryWidth().setColumnPreferred(rangeModel)"/>
+                <div class="flex w-full justify-between px-2 text-xs">
+                    <span v-for="number in useGalleryWidth().getMaxColumnPossible()" :key="number">{{ number }}</span>
+                </div>
+            </div>
         </div>
     </div>
 </template>
 
 <script lang="ts" setup>
+import { useGalleryWidth } from '@/composables/useGalleryWidth';
 import { useUtilStore } from '@/stores';
 const { getItemsPerPage, setItemsPerPage } = useUtilStore()
 
@@ -31,5 +39,7 @@ function eventHandler(e: Event) {
     }
 }
 
-
+const rangeModel = defineModel<number>({
+    default: useGalleryWidth().columnsRendered.value
+});
 </script>
