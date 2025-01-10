@@ -15,9 +15,9 @@
 import { useUtilStore } from '@/stores';
 import { ref } from 'vue';
 
-
-
 const isDark = ref<boolean>(useUtilStore().theme === 'dark');
+toggleTheme();
+
 function toggleTheme() {
 	useUtilStore().setTheme(isDark.value  ? 'dark' : 'light')
 }
