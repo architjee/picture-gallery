@@ -95,15 +95,15 @@ watch(getItemsPerPage, (itemsPerPageValue?: number) => {
     fetchImagesData(newPage as string, itemsPerPageValue ?? 30);
 });
 
-async function fetchImagesMetaData() {
-    await axios.get(`https://picsum.photos/v2/list?limit=100`);
-}
-
 async function fetchImagesData(page: string, itemsPerPage: number) {
-    const response = await axios.get(`https://picsum.photos/v2/list?page=${page}&limit=${itemsPerPage}`);
-    responseData.value = response.data;
-    observeImages();
-    loading.value = false;
+    try {
+        const response = await axios.get(`https://picsum.photos/v2/list?page=${page}&limit=${itemsPerPage}`);
+        responseData.value = response.data;
+        observeImages();
+        loading.value = false;
+    } catch (error) {
+        console.error('An error occured while fetching data from the API', error);
+    }
 }
 
 const isIntersectingCallback: IntersectionObserverCallback = (entries, observer) => {
@@ -138,7 +138,6 @@ const showSidePanel = ref(false);
 
 onMounted(() => {
     loading.value = true;
-    fetchImagesMetaData();
     fetchImagesData(props.page, getItemsPerPage.value);
     if (galleryContainerParent?.value) {
         const options = {

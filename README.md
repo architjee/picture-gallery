@@ -27,3 +27,12 @@ Demo at - https://picsum-photos.web.app/
 Using Pinia for state management, with persisted state plugin for persistance to localStorage
 
 Adding firebase with automatic CD using Github Action.
+
+
+Further Enhancements that can be made :
+    - Add ESLint
+    - HomePage can still be modularized
+    - Better Types.
+    - We could add throttling on intersection observer to improve performance.
+    - Add toast notification at error occurence.
+    - Extract out baseURl if API end point is fixed and use it from .env
