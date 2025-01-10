@@ -1,18 +1,17 @@
 <template>
-    <!-- page change netowrk progress indicator -->
+    <!-- page change network progress indicator -->
     <progress v-show="loading" class="d-progress shrink-0 h-1 w-full"></progress>
-
     <div class="grow flex overflow-y-auto divide-x-2 divide-base-300">
         <div class="size-full @container overflow-y-scroll">
             <div ref="galleryContainerParent"
-                class=" w-full h-full grid grow grid-cols-1 @2xl:grid-cols-2 @5xl:grid-cols-3 @7xl:grid-cols-4 gap-4 overflow-y-scroll place-items-center px-4 py-8">
-                <ImageCard v-for="image of responseData" key="image.id" :image-data="image" :intersectionObserverRef
+                class="w-full h-full grid grow grid-cols-1 @2xl:grid-cols-2 @5xl:grid-cols-3 @7xl:grid-cols-4 gap-4 overflow-y-scroll place-items-center px-4 py-8">
+                <ImageCard v-for="image of responseData" :key="image.id" :image-data="image" :intersectionObserverRef
                     class="hover:scale-105 hover:cursor-pointer duration-200" @click="handleImageClick(image)" />
                 <div
                     class="grow-0 col-span-1 @2xl:col-span-2 @5xl:col-span-3 @7xl:col-span-4 shrink-0 flex flex-col justify-center py-2">
                     <template v-if="responseData.length">
                         <p class="text-center text-xs my-2">
-                            Showing {{ useUtilStore().getItemsPerPage }} images per page.
+                            Showing {{ getItemsPerPage }} images per page.
                         </p>
                         <PaginationControls :page="pageMeta.currentPage" />
                     </template>
@@ -30,7 +29,6 @@
                     <i class="i-heroicons-x-mark"></i>
                 </button>
             </div>
-            <!-- <div class="size-full"> -->
             <div v-if="previewImageRef" :class="{ 'blur-xl': !previewImageRef.isVisible }"
                 :style="{ backgroundImage: getBgImage }"
                 class="size-full bg-cover overflow-y-hidden bg-no-repeat bg-center">
@@ -38,7 +36,6 @@
                     class="size-full object-contain backdrop-blur-xl"
                     :class="previewImageRef.isVisible ? 'block' : 'hidden'" alt="">
             </div>
-            <!-- </div> -->
             <div class="grow">
                 <div class="mx-auto w-fit text-center">
                     <a class="text-info hover:cursor-pointer hover:underline">{{ previewImageRef.url }}</a>
@@ -64,35 +61,26 @@ import type { ImageInterface } from '@/types';
 import { useWindowResize } from './composable';
 import { useGalleryWidth } from '@/composables/useGalleryWidth';
 import { useUtilStore } from '@/stores';
+import { storeToRefs } from 'pinia';
 
 const { width } = useWindowResize();
 const { setGalleryWidth } = useGalleryWidth();
-// Props
+const { getItemsPerPage } = storeToRefs(useUtilStore());
+
+const SCREEN_MD = 768;
 const props = defineProps({
     page: {
         type: String,
         required: false,
         default: '1',
     },
-})
-
-
-const SCREEN_MD = 768;
-// state
-// const { itemsPerPage, getItemsPerPage } = useUtilStore();
-// const { itemsPerPage } = storeToRefs(useUtilStore());
-watch(() => useUtilStore().getItemsPerPage, (itemsPerPageValue?: number) => {
-    console.log('getItemsPerPage got updated');
-
-    loading.value = true;
-    const newPage = useRoute()?.query?.page || '1';
-    fetchImagesData(newPage as string, itemsPerPageValue ?? 30);
-})
+});
 
 const pageMeta = computed(() => ({
     currentPage: Number(props.page),
     totalItems: 100,
 }));
+
 const loading = ref<boolean>(false);
 const intersectionObserverRef = ref<IntersectionObserver>();
 const resizeObserverRef = ref<ResizeObserver>();
@@ -109,40 +97,42 @@ const previewImageRef = ref<ImageInterface & { isVisible: boolean }>({
     isVisible: false
 });
 
+watch(getItemsPerPage, (itemsPerPageValue?: number) => {
+    loading.value = true;
+    const newPage = useRoute()?.query?.page || '1';
+    fetchImagesData(newPage as string, itemsPerPageValue ?? 30);
+});
+
 async function fetchImagesMetaData() {
     await axios.get(`https://picsum.photos/v2/list?limit=100`);
 }
 
 async function fetchImagesData(page: string, itemsPerPage: number) {
-    console.log('fetchImagesData invoked');
-
     const response = await axios.get(`https://picsum.photos/v2/list?page=${page}&limit=${itemsPerPage}`);
     responseData.value = response.data;
     observeImages();
     loading.value = false;
 }
 
-const isIntersectingCallback: IntersectionObserverCallback = (entries: IntersectionObserverEntry[], observer: IntersectionObserver) => {
+const isIntersectingCallback: IntersectionObserverCallback = (entries, observer) => {
     entries.forEach((entry) => {
         if (entry.isIntersecting) {
             const imageId = Number(entry.target.getAttribute('data-image-id'));
             const image = responseData.value.find(img => Number(img.id) === imageId);
             if (image) {
-                console.log('Image with id is visible', image.id);
                 image.isVisible = true;
             }
             observer.unobserve(entry.target);
         }
     });
-}
+};
 
-const resizeObserverCallback: ResizeObserverCallback = (entries: ResizeObserverEntry[], observer: ResizeObserver) => {
+const resizeObserverCallback: ResizeObserverCallback = (entries) => {
     entries.forEach((entry) => {
         const width = entry.borderBoxSize[0].inlineSize;
-        console.log('ResizeObserverCallback', width, entry.borderBoxSize[0].blockSize);
         setGalleryWidth(width);
     });
-}
+};
 
 function observeImages() {
     if (intersectionObserverRef.value) {
@@ -151,17 +141,18 @@ function observeImages() {
         });
     }
 }
+
 const showSidePanel = ref(false);
+
 onMounted(() => {
     loading.value = true;
     fetchImagesMetaData();
-    fetchImagesData(props.page, useUtilStore().getItemsPerPage);
+    fetchImagesData(props.page, getItemsPerPage.value);
     if (galleryContainerParent?.value) {
         const options = {
             root: galleryContainerParent?.value,
-            rootMargin: "0px", // This can be changed based on the requirement on how much offset we wish to preload
+            rootMargin: "0px",
         };
-        console.log(galleryContainerParent.value, galleryContainerParent.value?.getBoundingClientRect().height);
         intersectionObserverRef.value = new IntersectionObserver(isIntersectingCallback, options);
         resizeObserverRef.value = new ResizeObserver(resizeObserverCallback);
         resizeObserverRef.value.observe(galleryContainerParent.value);
@@ -171,28 +162,24 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-    if (intersectionObserverRef.value) {
-        intersectionObserverRef.value?.disconnect();
-    }
-})
+    intersectionObserverRef.value?.disconnect();
+});
 
-// Use beforeRouteUpdate to handle route changes
 onBeforeRouteUpdate((to, _from, next) => {
     loading.value = true;
     const newPage = to?.query.page || '1';
-    fetchImagesData(newPage as string, useUtilStore().getItemsPerPage);
+    fetchImagesData(newPage as string, getItemsPerPage.value);
     next();
 });
 
 function handleImageClick(image: ImageInterface) {
     if (image.id !== previewImageRef.value.id) {
-        console.log(image);
         previewImageRef.value = { ...image, isVisible: false };
         showSidePanel.value = true;
     } else {
         showSidePanel.value = !showSidePanel.value;
     }
 }
-const getBgImage = computed(() => `url(https://picsum.photos/id/${previewImageRef.value.id}/30/20)`)
 
+const getBgImage = computed(() => `url(https://picsum.photos/id/${previewImageRef.value.id}/30/20)`);
 </script>
