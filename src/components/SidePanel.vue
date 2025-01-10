@@ -2,18 +2,16 @@
     <Teleport to="#modal_box_content" :disabled="!isMobile">
         <div v-if="showSidePanel" class="w-full h-full grow flex flex-col overflow-x-clip">
             <div class="flex w-full justify-end pb-4 md:p-4">
-                <form method="dialog">
-                    <button class="d-btn d-btn-sm d-btn-circle d-btn-outline right-2 top-2"
-                        @click="handleClose">
-                        <i class="i-heroicons-x-mark"></i>
-                    </button>
-                </form>
+                <button class="d-btn d-btn-sm d-btn-circle d-btn-outline right-2 top-2" @click="handleClose">
+                    <i class="i-heroicons-x-mark"></i>
+                </button>
             </div>
             <div v-if="props.previewImageData" :class="{ 'blur-xl': !isVisible }"
                 :style="{ backgroundImage: getBgImage }"
                 class="size-full bg-cover overflow-y-hidden bg-no-repeat bg-center">
                 <img :src="props.previewImageData.download_url" @load="isVisible = true"
-                    class="size-full object-contain backdrop-blur-xl" :class="isVisible ? 'block' : 'hidden'" alt="" :key="props.previewImageData.download_url">
+                    class="size-full object-contain backdrop-blur-xl" :class="isVisible ? 'block' : 'hidden'" alt=""
+                    :key="props.previewImageData.download_url">
             </div>
             <div class="grow">
                 <div class="mx-auto w-fit text-center">
@@ -42,14 +40,14 @@ const props = defineProps<{ previewImageData?: ImageInterface }>();
 const isVisible = ref<boolean>(false);
 
 const showSidePanel = defineModel<boolean>();
-const dialogElementRef =  ref<HTMLDialogElement>()
+const dialogElementRef = ref<HTMLDialogElement>()
 
 const getBgImage = computed(() => `url(https://picsum.photos/id/${props.previewImageData?.id}/30/20)`);
-const isMobile = computed(()=> width.value < SCREEN_MD);
+const isMobile = computed(() => width.value < SCREEN_MD);
 
 watch(isMobile, (newValue) => {
     dialogElementRef.value?.showModal();
-    if(!newValue){
+    if (!newValue) {
         dialogElementRef.value?.close();
     }
 })
@@ -61,10 +59,10 @@ function handleClose() {
     }
     showSidePanel.value = false;
 }
-onMounted(()=>{
+onMounted(() => {
     dialogElementRef.value = document.getElementById('teleportableModal') as HTMLDialogElement;
-    if(showSidePanel && isMobile.value){
-        dialogElementRef.value?.showModal(); 
+    if (showSidePanel && isMobile.value) {
+        dialogElementRef.value?.showModal();
     }
 })
 
