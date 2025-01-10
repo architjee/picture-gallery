@@ -38,12 +38,12 @@
             </div>
             <div class="grow">
                 <div class="mx-auto w-fit text-center">
-                    <a class="text-info hover:cursor-pointer hover:underline">{{ previewImageRef.url }}</a>
+                    <a class="text-info hover:cursor-pointer hover:underline">{{ previewImageRef?.url }}</a>
                     <p class="text-sm">
-                        Size : {{ previewImageRef.width }} x {{ previewImageRef.height }}
+                        Size : {{ previewImageRef?.width }} x {{ previewImageRef?.height }}
                     </p>
                     <p class="italic">
-                        Author : {{ previewImageRef.author }}
+                        Author : {{ previewImageRef?.author }}
                     </p>
                 </div>
             </div>
@@ -87,15 +87,7 @@ const resizeObserverRef = ref<ResizeObserver>();
 const galleryContainerParent = ref<HTMLDivElement>();
 
 const responseData = ref<Array<ImageInterface & { isVisible: boolean }>>([]);
-const previewImageRef = ref<ImageInterface & { isVisible: boolean }>({
-    id: "2",
-    author: "Alejandro Escamilla",
-    width: 5000,
-    height: 3333,
-    url: "https://unsplash.com/photos/N7XodRrbzS0",
-    download_url: "https://picsum.photos/id/2/5000/3333",
-    isVisible: false
-});
+const previewImageRef = ref<ImageInterface & { isVisible: boolean }>();
 
 watch(getItemsPerPage, (itemsPerPageValue?: number) => {
     loading.value = true;
@@ -173,7 +165,7 @@ onBeforeRouteUpdate((to, _from, next) => {
 });
 
 function handleImageClick(image: ImageInterface) {
-    if (image.id !== previewImageRef.value.id) {
+    if (image.id !== previewImageRef?.value?.id) {
         previewImageRef.value = { ...image, isVisible: false };
         showSidePanel.value = true;
     } else {
@@ -181,5 +173,5 @@ function handleImageClick(image: ImageInterface) {
     }
 }
 
-const getBgImage = computed(() => `url(https://picsum.photos/id/${previewImageRef.value.id}/30/20)`);
+const getBgImage = computed(() => `url(https://picsum.photos/id/${previewImageRef?.value?.id}/30/20)`);
 </script>
