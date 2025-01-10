@@ -3,12 +3,15 @@
     <progress v-show="loading" class="d-progress shrink-0 h-1 w-full"></progress>
     <div class="grow flex overflow-y-auto divide-x-2 divide-base-300">
         <div class="size-full @container overflow-y-scroll">
+            <!-- grid-cols-1 @2xl:grid-cols-2 @5xl:grid-cols-3 @7xl:grid-cols-4 -->
             <div ref="galleryContainerParent"
-                class="w-full h-full grid grow grid-cols-1 @2xl:grid-cols-2 @5xl:grid-cols-3 @7xl:grid-cols-4 gap-4 overflow-y-scroll place-items-center px-4 py-8">
+                class="w-full h-full grid grow @2xl:[--grid-cols:2] @5xl:[--grid-cols:3] @7xl:[--grid-cols:4] gap-4 overflow-y-scroll place-items-center px-4 py-8"
+                style="grid-template-columns: repeat(var(--grid-cols, 1), minmax(0, 1fr));">
                 <ImageCard v-for="image of responseData" :key="image.id" :image-data="image" :intersectionObserverRef
                     class="hover:scale-105 hover:cursor-pointer duration-200" @click="handleImageClick(image)" />
-                <div
-                    class="grow-0 col-span-1 @2xl:col-span-2 @5xl:col-span-3 @7xl:col-span-4 shrink-0 flex flex-col justify-center py-2">
+                <!-- col-span-1 @2xl:col-span-2 @5xl:col-span-3 @7xl:col-span-4 -->
+                <div class="grow-0  shrink-0 flex flex-col justify-center py-2"
+                    style="grid-column: span var(--grid-cols, 1) / span var(--grid-cols, 1);">
                     <template v-if="responseData.length">
                         <p class="text-center text-xs my-2">
                             Showing {{ getItemsPerPage }} images per page.
@@ -23,8 +26,9 @@
                 </div>
             </div>
         </div>
-            <SidePanel v-if="showSidePanel" v-model="showSidePanel" :previewImageData="previewImageRef!" @update:modelValue="closeSidePanel">
-            </SidePanel>
+        <SidePanel v-if="showSidePanel" v-model="showSidePanel" :previewImageData="previewImageRef!"
+            @update:modelValue="closeSidePanel">
+        </SidePanel>
     </div>
     <!-- Open the modal using ID.showModal() method -->
 </template>
