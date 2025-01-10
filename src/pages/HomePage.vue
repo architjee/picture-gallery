@@ -3,13 +3,11 @@
     <progress v-show="loading" class="d-progress shrink-0 h-1 w-full"></progress>
     <div class="grow flex overflow-y-auto divide-x-2 divide-base-300">
         <div class="size-full @container overflow-y-scroll">
-            <!-- grid-cols-1 @2xl:grid-cols-2 @5xl:grid-cols-3 @7xl:grid-cols-4 -->
             <div ref="galleryContainerParent"
-                class="w-full h-full grid grow @2xl:[--grid-cols:2] @5xl:[--grid-cols:3] @7xl:[--grid-cols:4] gap-4 overflow-y-scroll place-items-center px-4 py-8"
-                style="grid-template-columns: repeat(var(--grid-cols, 1), minmax(0, 1fr));">
+                class="w-full h-full grid grow gap-4 overflow-y-scroll place-items-center px-4 py-8"
+                style="grid-template-columns: repeat(var(--grid-cols, 1), minmax(0, 1fr));" :style="{'--grid-cols': renderColumns}">
                 <ImageCard v-for="image of responseData" :key="image.id" :image-data="image" :intersectionObserverRef
                     class="hover:scale-105 hover:cursor-pointer duration-200" @click="handleImageClick(image)" />
-                <!-- col-span-1 @2xl:col-span-2 @5xl:col-span-3 @7xl:col-span-4 -->
                 <div class="grow-0  shrink-0 flex flex-col justify-center py-2"
                     style="grid-column: span var(--grid-cols, 1) / span var(--grid-cols, 1);">
                     <template v-if="responseData.length">
@@ -36,7 +34,7 @@
 import PaginationControls from '@/components/PaginationControls.vue';
 import ImageCard from '@/components/ImageCard.vue';
 import axios from 'axios';
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { computed, onMounted, onUnmounted, ref,  watch } from 'vue';
 import { onBeforeRouteUpdate, useRoute } from 'vue-router';
 import type { ImageInterface } from '@/types';
 import { useGalleryWidth } from '@/composables/useGalleryWidth';
@@ -58,6 +56,7 @@ const pageMeta = computed(() => ({
     currentPage: Number(props.page),
     totalItems: 100,
 }));
+const renderColumns = ref(1);
 
 const loading = ref<boolean>(false);
 const intersectionObserverRef = ref<IntersectionObserver>();
@@ -72,6 +71,10 @@ watch(getItemsPerPage, (itemsPerPageValue?: number) => {
     const newPage = useRoute()?.query?.page || '1';
     fetchImagesData(newPage as string, itemsPerPageValue ?? 30);
 });
+
+watch(()=> useGalleryWidth().columnsRendered.value,(columnsRendered: number)=>{
+    renderColumns.value = columnsRendered;
+})
 
 async function fetchImagesData(page: string, itemsPerPage: number) {
     try {
@@ -118,8 +121,10 @@ const resizeObserverCallback: ResizeObserverCallback = (entries) => {
             if(useGalleryWidth().getMaxColumnPossible() !== maxCols){
                 useGalleryWidth().setMaxColumnPossible(maxCols);
                 galleryContainerParent.value.style.setProperty('--max-col-possible', String(maxCols));
-                console.log(galleryContainerParent.value.style.getPropertyValue('--max-col-possible'));
+                console.log(galleryContainerParent.value.style.getPropertyValue('--max-col-possible and set '));
+                useUtilStore().setMaxItemsPerRow(maxCols);
             }
+            useGalleryWidth().setGalleryWidth(maxCols);
             // set a css variable indicating the max allowed
         }
     });
